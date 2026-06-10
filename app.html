@@ -1,1 +1,162 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <!--
+    Dashboard (app.html)
+    Main application screen after login. pick a list, add tasks, edit or delete them.
+    If someone opens this without logging in, ui.js setupAppPage() checks auth and sends
+    them back to login.html.
+  -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeBud | Dashboard</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!--
+        Dashboard header. Log out returns to welcome screen.
+        Profile circle shows first letter of their name from Supabase session.
+      -->
+      <header class="app-header">
+        <p class="app-header__title">Welcome to LifeBud</p>
+        <div class="app-header__actions">
+          <div class="profile-icon" id="profile-icon" title="Profile">U</div>
+          <button type="button" class="btn btn--dark" id="logout-btn">Log out</button>
+        </div>
+      </header>
+
+      <div class="app-layout">
+        <!--
+          Left sidebar. List buttons built by ui.js from StorageManager.
+        -->
+        <aside class="app-sidebar panel-box">
+          <h2 class="section-title">Your lists</h2>
+          <button type="button" class="btn btn--primary" id="add-list-btn">Add list</button>
+          <div id="list-buttons" class="list-buttons"></div>
+        </aside>
+
+        <!--
+          Middle column. Add form, edit panel, and task cards.
+        -->
+        <section class="app-main panel-box">
+          <h2 class="app-main__heading" id="active-list-heading">Work</h2>
+
+          <!--
+            Add task form. Submit handled in ui.js setupAppPage().
+            Input ids match what ui.js reads and maps to Task class fields.
+          -->
+          <form class="new-task-form" id="add-task-form">
+            <div class="field new-task-form__list-field">
+              <label for="task-list">List</label>
+              <select class="select" id="task-list" aria-label="List"></select>
+            </div>
+
+            <div class="new-task-form__row">
+              <input
+                class="input"
+                type="text"
+                id="task-title"
+                placeholder="What task needs doing?"
+              />
+              <select class="select" id="task-priority" aria-label="Priority">
+                <option value="high">High</option>
+                <option value="medium" selected>Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <input class="input" type="date" id="task-due-date" aria-label="Due date" />
+            </div>
+
+            <label class="new-task-form__notes-label" for="task-notes">Notes</label>
+            <textarea
+              class="textarea"
+              id="task-notes"
+              placeholder="Extra information........"
+            ></textarea>
+
+            <button type="submit" class="btn btn--primary">Add task</button>
+          </form>
+
+          <!--
+            Edit task panel. Starts hidden. ui.js fills fields when they click Edit.
+            cancel-edit-btn closes without saving.
+          -->
+          <section class="edit-task-form is-hidden" id="edit-task-panel" aria-hidden="true">
+            <h3 class="edit-task-form__title">Edit task</h3>
+            <form id="edit-task-form">
+              <!--
+                Hidden task id. Tells tasks.js update which task to change in Supabase.
+              -->
+              <input type="hidden" id="edit-task-id" />
+
+              <div class="field new-task-form__list-field">
+                <label for="edit-task-list">List</label>
+                <select class="select" id="edit-task-list" aria-label="List"></select>
+              </div>
+
+              <div class="new-task-form__row">
+                <input
+                  class="input"
+                  type="text"
+                  id="edit-task-title"
+                  placeholder="What task needs doing?"
+                />
+                <select class="select" id="edit-task-priority" aria-label="Priority">
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <input class="input" type="date" id="edit-task-due-date" aria-label="Due date" />
+              </div>
+
+              <label class="new-task-form__notes-label" for="edit-task-notes">Notes</label>
+              <textarea
+                class="textarea"
+                id="edit-task-notes"
+                placeholder="Extra information........"
+              ></textarea>
+
+              <div class="edit-task-form__actions">
+                <button type="submit" class="btn btn--primary">Save changes</button>
+                <button type="button" class="btn btn--dark" id="cancel-edit-btn">Cancel</button>
+              </div>
+            </form>
+          </section>
+
+          <!--
+            Where task cards appear. ui.js wipes this and draws cards when tasks exist.
+          -->
+          <div class="task-list-area" id="task-list-area">
+            <div class="empty-state">No tasks yet. Add one above.</div>
+          </div>
+        </section>
+
+        <!--
+          Upcoming column. Tasks due in 1 to 3 days. ui.js fills this.
+        -->
+        <aside class="app-upcoming panel-box">
+          <div class="upcoming-header">
+            <h2 class="upcoming-header__title">Upcoming Tasks</h2>
+            <p class="upcoming-header__hint">Due in 1 to 3 days</p>
+          </div>
+          <div id="upcoming-tasks-area"></div>
+        </aside>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/classes/Theme.js"></script>
+    <script src="js/classes/Navigation.js"></script>
+    <script src="js/classes/Task.js"></script>
+    <script src="js/classes/TaskList.js"></script>
+    <script src="js/classes/StorageManager.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

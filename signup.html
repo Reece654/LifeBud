@@ -1,1 +1,168 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="en">
+  
+<!--
+    Sign up page:
+
+    Our new users will enter their details here before they can log in. 
+    
+    This will create an account in our Supabase database.
+    
+    This page will sit after welcome and before log in in the
+    flow as per our plan. 
+    
+    We load the same Supabase script set as login.html so both auth screens stay aligned.
+  -->
+
+  <head>
+    
+    <!--
+      Page setup plus our four stylesheets in the same order on every LifeBud page.
+
+      theme.css loads first. 
+      
+      I have noted the purpose of each stylesheet in the login.html file, so please refer to that for more information if needed.
+
+      Just want to streamline and simplify our comments where we can.
+    -->
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeBud — Sign up</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+  </head>
+  <body>
+
+    <!--
+      Auth page wrapper. 
+      Shared class auth page with log in so both screens use the same centred column layout from pages.css.
+    -->
+
+    <main class="auth-page">
+
+      <!--
+        Logo plus a short signup descriptioo so users know they are creating an account,
+        not returning like on login.html which uses Welcome Back.
+      -->
+
+      <header class="auth-page__header">
+        <h1 class="logo logo--small">LifeBud</h1>
+        <p class="auth-page__subtitle">Create your account</p>
+      </header>
+
+      <!--
+        Sign up card. 
+        This one holds the sign up form.
+        Class card is shared with welcome and log in so every auth screen looks consistent.
+      -->
+
+      <section class="card auth-card">
+        <h2 class="auth-card__title">Sign up</h2>
+
+        <!--
+          Sign up form. 
+          id signup form is how ui.js setupSignupPage() finds it from main.js.
+          Submit is handled in JavaScript (preventDefault) so the page does not reload.
+          On success signup message shows feedback then we send the user to login.html.
+          auth.js creates the account in Supabase before redirect.
+        -->
+        <form id="signup-form">
+
+          <!--
+            First name and surname on one row.
+            class field row is a two column grid on desktop in components.css and stacks on narrow phones.
+            ids match what ui.js reads on submit.
+          -->
+
+          <div class="field-row">
+            <div class="field">
+              <label for="signup-first-name">First name</label>
+              <input class="input" type="text" id="signup-first-name" name="firstName" />
+            </div>
+
+            <div class="field">
+              <label for="signup-surname">Surname</label>
+              <input class="input" type="text" id="signup-surname" name="surname" />
+            </div>
+          </div>
+
+          <!--
+            Email field.
+            Type email helps phones show the right keyboard.
+            id signup email is read in ui.js when the user submits. 
+          -->
+
+
+          <div class="field">
+            <label for="signup-email">E-mail</label>
+            <input
+              class="input"
+              type="email"
+              id="signup-email"
+              name="email"
+              placeholder="email@example.com"
+              autocomplete="email"
+            />
+          </div>
+
+          <!--
+            Password field. 
+            Autocomplete new password helps password managers treat this as account creation. 
+            Minimum length rules live in auth logic (auth.js).
+          -->
+            
+          <div class="field">
+            <label for="signup-password">Password</label>
+            <input
+              class="input"
+              type="password"
+              id="signup-password"
+              name="password"
+              placeholder="************"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <!--
+            Feedback line. 
+          -->
+
+          <p class="form-message" id="signup-message"></p>
+
+          <!--
+            Submit button. 
+          -->
+
+          <button type="submit" class="btn btn--primary">Create account</button>
+        </form>
+
+        <!--
+          Footer link for returning users.
+        -->
+
+        <p class="auth-footer">
+          Already have an account?
+          <a href="login.html" id="go-login">Login</a>
+        </p>
+
+        <!--
+          Terms placeholder.
+          We will build a terms page later on (Post project submission/future sprint).
+        -->
+
+        <p class="auth-card__terms">Terms of service</p>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/classes/Theme.js"></script>
+    <script src="js/classes/Navigation.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

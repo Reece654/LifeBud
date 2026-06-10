@@ -1,1 +1,185 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <!--
+    Our login page will let our users who already have an account enter their email and password, then continue
+    to the dashboard (app.html) when auth succeeds. We have sat this page between welcome and the main app as per our project proposal plan.
+  -->
+
+  <head>
+   
+    <!--
+      Page setup plus our four stylesheets in the same order on every LifeBud page.
+
+      theme.css will load first.
+      
+      It will define our colour and spacing names on the page root (our variables like
+      --color-primary) with the same hex values as Theme.js. 
+      
+      Fallback so the browser paints the page from CSS before our scripts at the bottom run.
+      
+      When main.js runs, Theme.js overwrites those variables with applyToPage() so the live palette still comes from
+      one JavaScript class. 
+      
+      Without our theme.css file, buttonss and backgrounds that use var(--color-primary)
+      could look wrong or plain for a moment until JavaScript loads.
+
+      base.css resets default browser spacing and sets body text and our link styles.
+
+      components.css styles share pieces such as buttons, inputs, and the card panel around the form.
+      
+      pages.css lays out the auth screen (centred column, header, and log-in card) for this page.
+
+    -->
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeBud — Log in</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+  </head>
+  <body>
+
+    <!--
+      Auth page outer container (Wrapper) that will group everything belonging to this screen.
+      We put the logo header and the login card inside one main box instead of styling
+      the body or each piece on its own.
+
+      Our pages.css file will target .auth-page with minimum height 100vh and flexbox so the
+      whole auth screen is centtred on the page and stacks header, then card in a column.
+      
+      Child sections keep their own styles (logo size, card padding) while the wrapper
+      will handle  page level position and spacing.
+
+      One class on one element means log in and sign up share the same layout
+      without duplicating our CSS styling. 
+      
+      It matches our Figma design, project proposal plan and our OOP methodology.
+      
+    -->
+
+    <main class="auth-page">
+     
+      <!--
+        Top text for log in, Welcome Back matches our Figma prototype.
+
+        This header is separate from the card panel below so the screen matches our design.
+      -->
+
+      <header class="auth-page__header">
+        <h1 class="logo logo--small">LifeBud</h1>
+        <p class="auth-page__subtitle">Welcome Back!</p>
+      </header>
+
+      <!--
+        Log in card.
+      -->
+
+      <section class="card auth-card">
+        <h2 class="auth-card__title">Log in</h2>
+
+        <!--
+          Log in form. 
+          
+          ui.js setupLoginPage() finds it then main.js calls it on page load.
+          
+          Submit is handled in JavaScript (preventDefault) so the page does not reload.
+
+          On success Supabase manages the session and Navigation.goToApp() then opens the dashboard.
+
+          With Supabase wired, auth.js is intended to run signin before we redirect.
+        -->
+
+        <form id="login-form">
+          
+          <!--
+            Type email will help our users phones to show the right keyboard.
+            
+            id login email is read in ui.js when the user submits. 
+            
+            The label uses for="login-email" to match the input id. 
+            
+            That links the word Email to this box so a click on the label will move focus into the input, which gives a
+            larger click area and helps screen readers read out the field name when the input is focused.
+          -->
+
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input
+              class="input"
+              type="email"
+              id="login-email"
+              name="email"
+              placeholder="email@example.com"
+              autocomplete="email"
+            />
+          </div>
+
+          <!--
+            Password field. Hidden characters on screen. We do not store the password in
+            sessionStorage on purpose. Only safe session fields (such as email) belong there.
+          -->
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input
+              class="input"
+              type="password"
+              id="login-password"
+              name="password"
+              placeholder="************"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <!--
+            Error line. Starts empty. ui.js writes validation or Supabase error text here.
+          -->
+
+          <p class="error-message" id="login-error"></p>
+
+          <!--
+            Submit button. type submit so Enter works in the form.
+            Continue to app describes a successful redirect to app.html.
+          -->
+          <button type="submit" class="btn btn--primary">Continue to app</button>
+        </form>
+
+        <!--
+          Footer link for new users. href signup.html works even if JavaScript fails.
+          id go-signup lets ui.js use Navigation.goToSignup() like the welcome page buttons.
+        -->
+        <p class="auth-footer">
+          No account?
+          <a href="signup.html" id="go-signup">Sign Up</a>
+        </p>
+      </section>
+    </main>
+
+    <!--
+      Scripts at the end of the body so the HTML exists before JavaScript runs.
+
+      Supabase content delevery network provides the client library. 
+
+      Theme and Navigation match other pages.
+
+      supabase.js creates the client.
+
+      auth.js handles login and signup using Supabase.
+
+      ui.js wires the form.
+
+      main.js applies the theme and calls UI.
+
+      setupLoginPage() for this page.
+    -->
+      
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/classes/Theme.js"></script>
+    <script src="js/classes/Navigation.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

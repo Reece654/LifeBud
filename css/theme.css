@@ -1,0 +1,32 @@
+
+
+:root {
+  --color-primary: #6e93c4;
+  --color-white: #ffffff;
+  --color-panel: #2e496d;
+  --color-muted: rgba(201, 201, 201, 0.29);
+  --color-background: #233a59;
+  --color-accent-light: #bfcddf;
+  --color-background-deep: #1a2d45;
+  --color-border: rgba(191, 205, 223, 0.45);
+  --color-text-muted: rgba(255, 255, 255, 0.75);
+  --color-danger: #c45c5c;
+  --color-priority-high: #c45c5c;
+  --color-priority-medium: #c4a35c;
+  --color-priority-low: #5c9a6e;
+  --font-logo: "Tahoma", "Segoe UI", sans-serif;
+  --font-body: "Segoe UI", Tahoma, sans-serif;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --sidebar-width: 200px;
+  --upcoming-width: 260px;
+  --max-page-width: 1200px;
+  --max-auth-width: 420px;
+  --max-welcome-width: 520px;
+}

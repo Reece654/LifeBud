@@ -1,0 +1,76 @@
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--color-white);
+  background-color: var(--color-background);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--color-accent-light);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* error message styling for the login validation */
+.error-message {
+  color: #ffb4b4;
+  font-size: 0.875rem;
+  margin-top: var(--space-xs);
+  min-height: 1.25rem;
+}
+
+.error-message:empty {
+  display: none;
+}
+
+/* form message styling on signup for the success or fail */
+.form-message {
+  color: var(--color-accent-light);
+  font-size: 0.875rem;
+  margin-top: var(--space-sm);
+  min-height: 1.25rem;
+}
+
+.form-message:empty {
+  display: none;
+}

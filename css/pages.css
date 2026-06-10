@@ -1,0 +1,91 @@
+
+
+.page-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+/* welcome screen card panel */
+.welcome-card {
+  width: 100%;
+  max-width: var(--max-welcome-width);
+  text-align: center;
+}
+
+.welcome-card .logo {
+  margin-bottom: var(--space-sm);
+}
+
+.welcome-card__tagline {
+  font-size: 1.1rem;
+  margin-bottom: var(--space-md);
+}
+
+.welcome-card__text {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xl);
+  line-height: 1.6;
+}
+
+.welcome-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/*
+  the login and signup share the auth page so both screens look identical.
+  max width on auth card stops the form stretching on wide monitors.
+*/
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.auth-page__header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.auth-page__header .logo {
+  margin-bottom: var(--space-xs);
+}
+
+.auth-page__subtitle {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+/* login and signup card panel */
+.auth-card {
+  width: 100%;
+  max-width: var(--max-auth-width);
+}
+
+.auth-card__title {
+  font-size: 1.35rem;
+  margin-bottom: var(--space-lg);
+}
+
+.auth-card__terms {
+  margin-top: var(--space-md);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* stacks the auth card padding on mobile */
+@media (max-width: 640px) {
+  .welcome-card,
+  .auth-card {
+    padding: var(--space-lg);
+  }
+}

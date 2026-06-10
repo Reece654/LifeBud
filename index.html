@@ -1,4 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
+
+  <!--
+    Landing page:
+    We gave our landing page it's own file rather than hiding everything on one giant page because
+    it is easier for us to read and debug, and each Figma screen maps to one HTML file
+    the way we planned the app flow. 
+  -->
+
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!--
+      Standard page setup plus our four stylesheets.
+      See login.html for more information.
+    -->
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeBud | Welcome</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+  </head>
+  <body>
+
+    <!--
+      Main section for the welcome screen.
+      The class page center is styled in pages.css with flexbox so our card panel sits
+      in the middle on a phone or a wide monitor without us hard coding positions.
+    -->
+
+    <main class="page-center">
+
+      <!--
+        Welcome card. 
+        Holds the logo text.        
+      -->
+
+      <section class="card welcome-card">
+        <h1 class="logo">LifeBud</h1>
+        <p class="welcome-card__tagline">Your new organising best friend.</p>
+        <p class="welcome-card__text">
+          Any browser, PC or Mobile, NO SUBSCRIPTION.<br />
+          Add lists, set priorities, and keep everything organised in one calming space.
+        </p>
+
+        <!--
+          Button row.
+          Log in is primary and Sign up is secondary to match the visual hierarchy on our Figma design.
+          We use type="button" not submit because there is no <form> on this page.
+          The ids welcome-login and welcome-signup are how ui.js finds these buttons in
+          setupWelcomePage() and calls Navigation. We could use <a href> links in the future instead,
+          but buttons plus Navigation keep all our page jumps in one JavaScript class.
+        -->
+
+        <div class="welcome-card__actions">
+          <button type="button" class="btn btn--primary" id="welcome-login">Log in</button>
+          <button type="button" class="btn btn--secondary" id="welcome-signup">Sign up</button>
+        </div>
+      </section>
+    </main>
+
+    <!--
+      Scripts at the bottom so the HTML paints before JavaScript runs.
+      We only load Theme, Navigation, ui, and main here.
+      See login.html for more information.
+    -->
+
+    <script src="js/classes/Theme.js"></script>
+    <script src="js/classes/Navigation.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
