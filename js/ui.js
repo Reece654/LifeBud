@@ -270,7 +270,7 @@ showToast: function (message) {
     const heading = document.getElementById("active-list-heading");
     const taskArea = document.getElementById("task-list-area");
 
-    // We replace the heading text with the list name such as Work so the user always knows which list they are looking at.
+    // We replace the heading text with the list name passed in so the user always knows which list they are looking at.
 
     if (heading) {
       heading.textContent = listName;
@@ -308,6 +308,7 @@ showToast: function (message) {
     const panel = document.getElementById("edit-task-panel");
     const idInput = document.getElementById("edit-task-id");
     const titleInput = document.getElementById("edit-task-title");
+    const listInput = document.getElementById("edit-task-list");
     const priorityInput = document.getElementById("edit-task-priority");
     const dueDateInput = document.getElementById("edit-task-due-date");
     const notesInput = document.getElementById("edit-task-notes");
@@ -322,6 +323,10 @@ showToast: function (message) {
 
     idInput.value = task.id;
     titleInput.value = task.title;
+
+    // pre-selects whichever list this task is currently in
+    if (listInput) listInput.value = task.listName;
+
     priorityInput.value = task.priority;
     dueDateInput.value = task.dueDate || "";
     notesInput.value = task.description || "";
@@ -332,32 +337,13 @@ showToast: function (message) {
     panel.setAttribute("aria-hidden", "false");
   },
 
-  // We call this after a successful save or when the person presses cancel. We hide the panel and clear the form so the next edit starts fresh without old values hanging around.
-
-  closeEditTask: function () {
-    const panel = document.getElementById("edit-task-panel");
-    const form = document.getElementById("edit-task-form");
-
-    // We add the hidden class to tuck the panel away and tell assistive tech it is closed even though the html stays in the page for next time.
-
-    if (panel) {
-      panel.classList.add("is-hidden");
-      panel.setAttribute("aria-hidden", "true");
-    }
-
-    // Resetting the form clears every field including the hidden id so we do not accidentally save changes against the wrong task later.
-
-    if (form) {
-      form.reset();
-    }
-  },
-
   // The edit form runs this when the person saves. 
   // We read the fields, trim extra spaces, send the update through Tasks, then either show an error toast or close the panel and refresh the list.
 
   saveEditTask: async function () {
     const idInput = document.getElementById("edit-task-id");
     const titleInput = document.getElementById("edit-task-title");
+    const listInput = document.getElementById("edit-task-list");
     const priorityInput = document.getElementById("edit-task-priority");
     const dueDateInput = document.getElementById("edit-task-due-date");
     const notesInput = document.getElementById("edit-task-notes");
@@ -371,6 +357,7 @@ showToast: function (message) {
 
     const result = await Tasks.update(idInput.value, {
       title: titleInput.value.trim(),
+      listName: listInput ? listInput.value : "",
       description: notesInput ? notesInput.value.trim() : "",
       priority: priorityInput ? priorityInput.value : "Medium",
       dueDate: dueDateInput ? dueDateInput.value : ""
@@ -390,15 +377,76 @@ showToast: function (message) {
     UI.showToast("Task updated.");
   },
 
-  // After any add, edit, or delete we call this so the screen stays in sync with storage. 
-  // For now we always refresh the Work list and we can point at other lists when we add them later.
+  // tracks whichever list is currently shown on the dashboard
+  // defaults to General until something else gets selected
+  activeListName: "General",
+
+  // getActiveList returns whatever list is currently selected
+  getActiveList: function () {
+    return UI.activeListName;
+  },
+
+  // setActiveList updates state when a different list gets picked
+  // sidebar buttons and the list dropdown will call this once they exist
+  setActiveList: function (listName) {
+    UI.activeListName = listName;
+  },
+
+  // After any add, edit, or delete we call this so the screen stays in sync with storage.
+  // Refreshes the dashboard for whichever list is currently active.
 
   refreshDashboard: async function () {
-    await UI.renderTaskList("Work");
+    await UI.renderTaskList(UI.getActiveList());
+  },
+ 
+  // fillListDropdown builds the options inside task list and edit task list
+  // pulls every list name from Supabase so both dropdowns show real lists
+  // creates a default General list first if this user has none yet
+  fillListDropdown: async function () {
+    let lists = await Lists.getAll();
+
+    // if this user has no lists yet, create a default General list so the dropdowns are never empty
+    if (lists.length === 0) {
+      await Lists.add("General");
+      lists = await Lists.getAll();
+    }
+
+    const taskListSelect = document.getElementById("task-list");
+    const editListSelect = document.getElementById("edit-task-list");
+
+    // clears out old options first so refreshing does not just keep stacking duplicates
+    if (taskListSelect) taskListSelect.innerHTML = "";
+    if (editListSelect) editListSelect.innerHTML = "";
+
+    // builds one option per list name and drops it into both dropdowns
+    lists.forEach(function (name) {
+      // only builds an option if the add task dropdown actually exists on the page
+      if (taskListSelect) {
+
+        // builds a new option for this list name and adds it onto the end of the add task dropdown
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        taskListSelect.appendChild(option);
+      }
+      // does the exact same thing as above but for the edit task dropdown instead
+      if (editListSelect) {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        editListSelect.appendChild(option);
+      }
+    });
+
+    // defaults the add task dropdown to whatever list is currently active
+    // so it lines up with the heading and task cards already on screen instead of jumping back to the first option
+    if (taskListSelect) {
+      taskListSelect.value = UI.getActiveList();
+    }
   },
 
   // main.js runs this when app.html opens. We check the person is logged in, fill in the profile initial, load tasks, then connect every dashboard button and form to the right actions.
- 
+
   setupAppPage: async function () {
 
     // Auth.requireLogin looks for a valid Supabase session. If nobody is signed in auth sends them to login and returns false so we do not set up private task features for a guest.
@@ -419,17 +467,49 @@ showToast: function (message) {
       profileIcon.textContent = await Auth.getDisplayName();
     }
 
-    // We draw the Work task list right away so tasks appear as soon as the page loads and the person does not need to click anything first.
+    // We draw the active list's tasks right away so they appear as soon as the page loads and the person does not need to click anything first.
 
     await UI.refreshDashboard();
+    await UI.fillListDropdown();
 
-    // The add list button is visible in the layout but the feature is not built yet. 
-    // Clicking it only shows a toast that explains lists are coming in a future update.
-
+    // grabs the button, the hidden panel, the text input, and the confirm button by id
     const addListButton = document.getElementById("add-list-btn");
-    if (addListButton) {
+    const addListPanel = document.getElementById("add-list-panel");
+    const newListNameInput = document.getElementById("new-list-name");
+    const confirmAddListButton = document.getElementById("confirm-add-list-btn");
+
+    // clicking add list just reveals the hidden panel, nothing saved yet
+    if (addListButton && addListPanel) {
       addListButton.addEventListener("click", function () {
-        UI.showToast("Add list is planned for a later sprint.");
+
+        // removing is-hidden makes the panel appear, same way the edit task panel works
+        addListPanel.classList.remove("is-hidden");
+      });
+    }
+
+    // clicking confirm is what actually saves the new list
+    if (confirmAddListButton) {
+      confirmAddListButton.addEventListener("click", async function () {
+
+        // reads whatever the person typed into the input, empty string if the input is missing
+        const name = newListNameInput ? newListNameInput.value : "";
+
+        // sends the typed name to Supabase through Lists.add and waits for the result
+        const result = await Lists.add(name);
+
+        // if it fails (e.g. blank name) we leave the panel open so they can fix it and try again
+        if (!result.success) {
+          UI.showToast(result.message);
+          return;
+        }
+
+        // clears the input and hides the panel again now the list is saved
+        if (newListNameInput) newListNameInput.value = "";
+        addListPanel.classList.add("is-hidden");
+
+        // rebuilds both dropdowns so the new list shows up right away
+        await UI.fillListDropdown();
+        UI.showToast("List added.");
       });
     }
 
@@ -472,14 +552,15 @@ showToast: function (message) {
         // We grab each input from the add form by id. Trimming removes accidental spaces at the start or end so we do not save a blank looking title or notes.
 
         const titleInput = document.getElementById("task-title");
+        const listInput = document.getElementById("task-list");
         const priorityInput = document.getElementById("task-priority");
         const dueDateInput = document.getElementById("task-due-date");
         const notesInput = document.getElementById("task-notes");
 
-        // hardcoded to Work for now, list selection coming in a later sprint
-
+        // listName comes from whichever option is selected in the list dropdown
+        // priority defaults to Medium so it is never blank in storage if the person skips it
         const result = await Tasks.add({
-          listName: "Work",
+          listName: listInput ? listInput.value : UI.getActiveList(),
           title: titleInput ? titleInput.value.trim() : "",
           description: notesInput ? notesInput.value.trim() : "",
           priority: priorityInput ? priorityInput.value : "Medium",
@@ -487,14 +568,12 @@ showToast: function (message) {
         });
 
         // If adding fails we leave what the person typed in the form and show the error in a toast so they can fix it and try again.
-
         if (!result.success) {
           UI.showToast(result.message);
           return;
         }
 
         // If adding works we empty the text fields and set priority back to Medium so the form is ready for the next task without leftover values.
-        
         if (titleInput) titleInput.value = "";
         if (notesInput) notesInput.value = "";
         if (dueDateInput) dueDateInput.value = "";

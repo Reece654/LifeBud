@@ -50,13 +50,17 @@ const Tasks = {
       return { success: false, message: "Please enter a task title." };
     }
 
+    // removes extra spaces and use General if nothing was typed
+    const cleanListName = taskData.listName ? taskData.listName.trim() : "";
+    const listName = cleanListName === "" ? "General" : cleanListName;
+
     // sends the new task to Supabase and waits for a response
     const result = await supabaseClient
       .from("tasks")
       .insert({
         user_id: (await supabaseClient.auth.getSession()).data.session.user.id,
         title: taskData.title.trim(),
-        listName: taskData.listName,
+        listName: listName,
         description: taskData.description || "",
         priority: taskData.priority || "medium",
         dueDate: taskData.dueDate || null,
@@ -86,12 +90,16 @@ const Tasks = {
   // updates an existing task in Supabase
   update: async function (taskId, updates) {
 
+    // listname check, removes extra spaces and uses General if nothing was typed
+    const cleanListName = updates.listName ? updates.listName.trim() : "";
+    const listName = cleanListName === "" ? "General" : cleanListName;
+
     // sends the updated fields to Supabase and waits for a response
     const result = await supabaseClient
       .from("tasks")
       .update({
         title: updates.title,
-        listName: updates.listName,
+        listName: listName,
         description: updates.description || "",
         priority: updates.priority || "medium",
         dueDate: updates.dueDate || null,
