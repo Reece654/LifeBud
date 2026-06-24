@@ -159,11 +159,11 @@ showToast: function (message) {
     toast.textContent = message;
     toast.classList.remove("is-hidden");
 
-    // After some time (2800 milliseconds) we add the hidden class back. The banner disappears through css and stays in the page ready for the next message.
+    // After some time we add the hidden class back. The banner disappears through css and stays in the page ready for the next message.
 
     setTimeout(function () {
       toast.classList.add("is-hidden");
-    }, 2800);
+    }, 2800); // 2.8 seconds
   },
 
   // renderTaskList calls this for every task in a list. We build each card in code rather than writing html by hand, then return the finished piece so the list area can display it.
@@ -337,7 +337,27 @@ showToast: function (message) {
     panel.setAttribute("aria-hidden", "false");
   },
 
-  // The edit form runs this when the person saves. 
+  // We call this after a successful save or when the person presses cancel. We hide the panel and clear the form so the next edit starts fresh without old values hanging around.
+
+  closeEditTask: function () {
+    const panel = document.getElementById("edit-task-panel");
+    const form = document.getElementById("edit-task-form");
+
+    // We add the hidden class to tuck the panel away and tell assistive tech it is closed even though the html stays in the page for next time.
+
+    if (panel) {
+      panel.classList.add("is-hidden");
+      panel.setAttribute("aria-hidden", "true");
+    }
+
+    // Resetting the form clears every field including the hidden id so we do not accidentally save changes against the wrong task later.
+
+    if (form) {
+      form.reset();
+    }
+  },
+
+  // The edit form runs this when the person saves.
   // We read the fields, trim extra spaces, send the update through Tasks, then either show an error toast or close the panel and refresh the list.
 
   saveEditTask: async function () {
@@ -392,6 +412,30 @@ showToast: function (message) {
     UI.activeListName = listName;
   },
 
+  // ensureActiveListExists makes sure the active list is something that actually exists
+  // creates General if the user has no lists at all, and falls back to the first real list
+  // if the active list does not match any real list, like if general was assumed but never created
+  ensureActiveListExists: async function () {
+    let lists = await Lists.getAll();
+
+    // creates a default General list if this user genuinely has none yet
+    if (lists.length === 0) {
+      await Lists.add("General");
+      lists = await Lists.getAll();
+    }
+
+    // checks whether the currently active list name actually matches one of the real lists
+    const activeListIsReal = lists.some(function (name) {
+      return name === UI.getActiveList();
+    });
+
+    // falls back to whichever list is first if the active one turned out to be fake
+    // e.g. general was assumed active but was never actually created
+    if (!activeListIsReal) {
+      UI.setActiveList(lists[0]);
+    }
+  },
+
   // After any add, edit, or delete we call this so the screen stays in sync with storage.
   // Refreshes the dashboard for whichever list is currently active.
 
@@ -401,15 +445,9 @@ showToast: function (message) {
  
   // fillListDropdown builds the options inside task list and edit task list
   // pulls every list name from Supabase so both dropdowns show real lists
-  // creates a default General list first if this user has none yet
-  fillListDropdown: async function () {
-    let lists = await Lists.getAll();
 
-    // if this user has no lists yet, create a default General list so the dropdowns are never empty
-    if (lists.length === 0) {
-      await Lists.add("General");
-      lists = await Lists.getAll();
-    }
+  fillListDropdown: async function () {
+    const lists = await Lists.getAll();
 
     const taskListSelect = document.getElementById("task-list");
     const editListSelect = document.getElementById("edit-task-list");
@@ -445,6 +483,50 @@ showToast: function (message) {
     }
   },
 
+  // This part builds the row of list buttons that sit in the sidebar on the left side of the page.
+  // We make one button for every list the person has, so they always have a way to jump between
+  // their different lists. Clicking on one of these buttons is what changes which list is currently
+  // showing in the middle of the page.
+  fillListButtons: async function () {
+    const lists = await Lists.getAll();
+    const listButtonsContainer = document.getElementById("list-buttons");
+    if (!listButtonsContainer) return;
+
+    // We empty out the sidebar first before adding the buttons back in. Without this step, every
+    // time the row of buttons gets rebuilt the old ones would stay on the page and the new ones
+    // would just pile up underneath them.
+    listButtonsContainer.innerHTML = "";
+
+    lists.forEach(function (name) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "btn btn--list";
+      button.textContent = name;
+
+      // Here we check if this particular list is the one currently being shown, and if it is we
+      // give the button a different colour. This makes it clear to the person which list they are
+      // currently looking at, since the matching button stands out from the others.
+      if (name === UI.getActiveList()) {
+        button.classList.add("is-active");
+      }
+
+      // This is the code that runs when someone clicks one of the list buttons. First we update
+      // which list is currently active, then we redraw the task list and heading so they match the
+      // list that was just picked. We also rebuild the dropdown menus on the add and edit task forms
+      // here, since otherwise they would keep showing whichever list was active when the page first
+      // loaded rather than the one the person just switched to. Finally we redraw the sidebar buttons
+      // themselves so the highlighted one moves to match.
+      button.addEventListener("click", async function () {
+        UI.setActiveList(name);
+        await UI.refreshDashboard();
+        await UI.fillListDropdown();
+        await UI.fillListButtons();
+      });
+
+      listButtonsContainer.appendChild(button);
+    });
+  },
+
   // main.js runs this when app.html opens. We check the person is logged in, fill in the profile initial, load tasks, then connect every dashboard button and form to the right actions.
 
   setupAppPage: async function () {
@@ -467,10 +549,17 @@ showToast: function (message) {
       profileIcon.textContent = await Auth.getDisplayName();
     }
 
-    // We draw the active list's tasks right away so they appear as soon as the page loads and the person does not need to click anything first.
+    
+    // makes sure the active list genuinely exists before we draw anything using it
+    await UI.ensureActiveListExists();
 
+    // We draw the active list's tasks right away so they appear as soon as the page loads and the person does not need to click anything first.
     await UI.refreshDashboard();
     await UI.fillListDropdown();
+
+    // This builds the list buttons in the sidebar so the person has something to click on as soon
+    // as the page loads.
+    await UI.fillListButtons();
 
     // grabs the button, the hidden panel, the text input, and the confirm button by id
     const addListButton = document.getElementById("add-list-btn");
@@ -509,6 +598,10 @@ showToast: function (message) {
 
         // rebuilds both dropdowns so the new list shows up right away
         await UI.fillListDropdown();
+
+        // rebuilds the sidebar too, otherwise the new list only shows up in the dropdowns until something else refreshes it
+        await UI.fillListButtons();
+
         UI.showToast("List added.");
       });
     }
@@ -577,7 +670,7 @@ showToast: function (message) {
         if (titleInput) titleInput.value = "";
         if (notesInput) notesInput.value = "";
         if (dueDateInput) dueDateInput.value = "";
-        if (priorityInput) priorityInput.value = "Medium";
+        if (priorityInput) priorityInput.value = "medium";
 
         await UI.refreshDashboard();
         UI.showToast("Task added.");

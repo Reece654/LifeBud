@@ -39,7 +39,12 @@
           <button type="button" class="btn btn--primary" id="add-list-btn">Add list</button>
 
           <div id="add-list-panel" class="is-hidden">
-            <input type="text" id="new-list-name" placeholder="List name">
+            <!--
+              We gave this box the same style as every other field on the page, since it was missing that style
+              and looked like a plain white box before. We also gave it a label that screen readers can read out,
+              since this field did not have a visible label the way the other fields do.
+            -->
+            <input class="input" type="text" id="new-list-name" placeholder="List name" aria-label="New list name" />
             <button type="button" class="btn btn--primary btn--small" id="confirm-add-list-btn">Add</button>
           </div>
 
