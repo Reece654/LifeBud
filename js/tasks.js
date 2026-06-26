@@ -140,6 +140,26 @@ const Tasks = {
 
     // all good, tells the UI the task was removed
     return { success: true };
+  },
+
+  // opens a realtime channel and listens for changes to the tasks table
+  // whenever a task is added, edited, or deleted anywhere, we refresh the dashboard
+  // so it shows up straight away without the person needing to refresh the page
+  subscribeToChanges: function () {
+
+    const channel = supabaseClient
+      .channel("tasks-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks" },
+        function (payload) {
+          console.log("realtime change received:", payload);
+          UI.refreshDashboard();
+        }
+      )
+      .subscribe();
+
+    return channel;
   }
 
 };

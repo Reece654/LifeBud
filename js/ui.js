@@ -196,6 +196,14 @@ showToast: function (message) {
 
     // A due date is optional. We only add a second tag when one exists so tasks without a deadline do not show an empty label.
 
+    /* Our date currently displays in (YYYY-MM-DD) format as that is how Supabase and the
+       HTML date input store it. 
+       We are leaving it like this for now because we plan to replace
+       this line with getDueDateLabel() from Task.js in a later sprint. That method will show
+       friendlier text instead of the raw date, such as "Due today" or
+       "Overdue by 1 day". We will wire that in at the same time as the completed tasks and
+       upcoming tasks features, since all three rely on the same date logic in Task.js. */
+       
     if (task.dueDate) {
       const datePill = document.createElement("span");
       datePill.className = "task-card__pill";
@@ -560,6 +568,13 @@ showToast: function (message) {
     // This builds the list buttons in the sidebar so the person has something to click on as soon
     // as the page loads.
     await UI.fillListButtons();
+
+    // opens the realtime channel so the dashboard updates straight away if a task changes
+    // on another device signed into the same account, no manual refresh needed
+    Tasks.subscribeToChanges();
+
+    // does the same thing but for lists, so the sidebar and dropdowns update straight away too
+    Lists.subscribeToChanges();
 
     // grabs the button, the hidden panel, the text input, and the confirm button by id
     const addListButton = document.getElementById("add-list-btn");
