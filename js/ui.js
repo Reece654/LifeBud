@@ -569,6 +569,13 @@ showToast: function (message) {
     // as the page loads.
     await UI.fillListButtons();
 
+    // opens the realtime channel so the dashboard updates straight away if a task changes
+    // on another device signed into the same account, no manual refresh needed
+    Tasks.subscribeToChanges();
+
+    // does the same thing but for lists, so the sidebar and dropdowns update straight away too
+    Lists.subscribeToChanges();
+
     // grabs the button, the hidden panel, the text input, and the confirm button by id
     const addListButton = document.getElementById("add-list-btn");
     const addListPanel = document.getElementById("add-list-panel");

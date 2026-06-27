@@ -61,6 +61,27 @@ const Lists = {
 
     // returns the new list name
     return { success: true, name: result.data.name };
+  },
+
+  // opens a realtime channel and listens for changes to the lists table
+  // whenever a list is added, edited, or deleted anywhere, we rebuild the sidebar and dropdowns
+  // so it shows up straight away without the person needing to refresh the page
+  subscribeToChanges: function () {
+
+    const channel = supabaseClient
+      .channel("lists-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "lists" },
+        function (payload) {
+          console.log("realtime list change received:", payload);
+          UI.fillListButtons();
+          UI.fillListDropdown();
+        }
+      )
+      .subscribe();
+
+    return channel;
   }
 
 };
