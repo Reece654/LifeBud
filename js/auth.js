@@ -58,7 +58,6 @@ const Auth = {
 
   // checks the email field isnt empty and has an @ symbol
   validateEmail: function (email) {
-    // email validation, checks its not empty and has an @ symbol
     if (!email || email.trim() === "") return "Please enter your email.";
     if (email.indexOf("@") === -1) return "Email needs to include an @ symbol.";
     return "";
@@ -66,7 +65,6 @@ const Auth = {
 
   // checks the password isnt empty and is at least 6 characters long
   validatePassword: function (password) {
-    // password validation, checks its not empty and is at least 6 characters
     if (!password || password.trim() === "") return "Please enter your password.";
     if (password.length < 6) return "Password should be at least 6 characters.";
     return "";
@@ -74,7 +72,6 @@ const Auth = {
 
   // checks a name field isnt empty, used for first name and surname
   validateName: function (name, label) {
-    // name validation, checks the field isnt empty
     if (!name || name.trim() === "") return "Please enter your " + label + ".";
     return "";
   },

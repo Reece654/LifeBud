@@ -92,9 +92,9 @@
    stretching out too wide on big monitors, since a row of content that wide would be uncomfortable
    to read across. */
 .app-shell {
-  max-width: var(--max-page-width);
-  margin: 0 auto;
-  padding: var(--space-lg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* This is the bar across the top of the dashboard. The page title sits on the left side, and the
@@ -105,11 +105,15 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-lg);
+  background-color: var(--color-background-deep);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-md);
 }
 
 .app-header__title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .app-header__actions {
@@ -122,9 +126,9 @@
    so all three sections of the dashboard feel like part of one matching design rather than three
    separate styles. */
 .panel-box {
-  background-color: var(--color-panel);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  background-color: var(--color-background-deep);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
   border: 1px solid var(--color-border);
 }
 
@@ -136,6 +140,20 @@
   grid-template-columns: var(--sidebar-width) 1fr var(--upcoming-width);
   gap: var(--space-lg);
   align-items: start;
+  flex: 1;
+  max-width: var(--max-page-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+/* We set a minimum width of zero on each column so that when the grid is tight none of them
+   can accidentally overflow past the edge of their allotted space. Without this the browser
+   defaults to a minimum based on the content inside, which can push columns wider than we want. */
+.app-sidebar,
+.app-main,
+.app-upcoming {
+  min-width: 0;
 }
 
 .section-title {
@@ -143,7 +161,115 @@
   margin-bottom: var(--space-md);
 }
 
+/* We pushed the list of sidebar buttons down a little so they do not sit pressed right up against
+   the Add list button above them. */
+.list-buttons {
+  margin-top: var(--space-sm);
+}
+
 .app-main__heading {
   font-size: 1.3rem;
   margin-bottom: var(--space-lg);
+}
+
+/* These three rules style the small header at the top of the upcoming tasks column. We keep the
+   title compact and slightly muted compared to the main heading, and we add a gap below the whole
+   header block so the task cards underneath it have some breathing room. */
+.upcoming-header {
+  margin-bottom: var(--space-md);
+}
+
+.upcoming-header__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.upcoming-header__hint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* We space upcoming task cards apart using margin-top rather than margin-bottom so we do not end
+   up with extra space after the last card. The first card gets no top margin since there is
+   nothing above it to push away from. */
+#upcoming-tasks-area .task-card {
+  margin-top: var(--space-sm);
+}
+
+#upcoming-tasks-area .task-card:first-child {
+  margin-top: 0;
+}
+
+/* Once the screen gets narrower than this, three columns side by side start to feel cramped, so
+   we switch the dashboard to two columns instead. The sidebar spans across the full top row on
+   its own, and the main task area sits next to the upcoming tasks column underneath it. */
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "sidebar sidebar"
+      "main upcoming";
+  }
+
+  .app-sidebar {
+    grid-area: sidebar;
+  }
+
+  .app-main {
+    grid-area: main;
+  }
+
+  .app-upcoming {
+    grid-area: upcoming;
+  }
+
+  /* With the sidebar now spanning the full width, there is enough room to lay the list buttons
+     out in a row instead of stacking them, so we let them sit side by side and wrap onto a new
+     line if there are more of them than fit across. */
+  .app-sidebar .list-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .app-sidebar .btn--list {
+    width: auto;
+    margin-bottom: 0;
+  }
+}
+
+/* On a phone sized screen there is only really room for one column, so every part of the
+   dashboard stacks on top of the next, sidebar first, then the main task area, then upcoming
+   tasks underneath. The sidebar, main area, and upcoming column already know which named area
+   they belong to from the wider rule just above, so we only need to describe the new stacked
+   order here rather than repeating that part again. */
+@media (max-width: 640px) {
+  .app-header {
+    flex-wrap: wrap;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "sidebar"
+      "main"
+      "upcoming";
+    padding: var(--space-sm);
+  }
+
+  /* The title, priority, and due date normally sit side by side in one row, but on a narrow
+     screen that makes each one too thin to comfortably tap or read, so we stack them into their
+     own full width line each instead. */
+  .new-task-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  /* On a narrow screen the add task button would otherwise stretch only as wide as the grid column
+     it sits in, which can look odd when everything else stacks full width. This makes sure it
+     fills the whole available width the same way the other elements do. */
+  .new-task-form .btn--primary {
+    max-width: none;
+  }
 }

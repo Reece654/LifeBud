@@ -122,6 +122,22 @@
   }
 }
 
+/* This is the small circle that shows the first letter of someone's name in the top right of the
+   dashboard. We make it perfectly round using a border radius of fifty percent, and we centre the
+   letter inside it both across and down, so it always sits right in the middle of the circle no
+   matter what letter it happens to be. */
+.profile-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 /* This gives every list button in the sidebar the same look. We make each button take up the full
    width of the sidebar and line the text up on the left side, so the whole row reads clearly from
    top to bottom. Each one also gets a small gap underneath it so the buttons do not sit squashed
@@ -130,10 +146,12 @@
   display: block;
   width: 100%;
   text-align: left;
-  background-color: var(--color-panel);
+  background-color: var(--color-background-deep);
   color: var(--color-white);
   border: 1px solid var(--color-border);
   margin-bottom: var(--space-xs);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
 }
 
 /* When a list button matches whichever list is currently open on the page, we add this on top of
@@ -151,7 +169,6 @@
   background-color: var(--color-background-deep);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-border);
   padding: var(--space-md);
   margin-bottom: var(--space-md);
 }
@@ -161,19 +178,20 @@
    third, so a person can tell how urgent a task is just by glancing at the colour without needing
    to read anything. */
 .task-card--priority-high {
-  border-left-color: var(--color-priority-high);
+  border-left: 4px solid var(--color-priority-high);
 }
 
 .task-card--priority-medium {
-  border-left-color: var(--color-priority-medium);
+  border-left: 4px solid var(--color-priority-medium);
 }
 
 .task-card--priority-low {
-  border-left-color: var(--color-priority-low);
+  border-left: 4px solid var(--color-priority-low);
 }
 
 .task-card__title {
   font-size: 1.1rem;
+  font-weight: 600;
   margin-bottom: var(--space-sm);
 }
 
@@ -184,6 +202,10 @@
   display: flex;
   gap: var(--space-xs);
   margin-bottom: var(--space-sm);
+  /* On a narrow screen there may not be enough room for every tag to fit across in one line, so
+     we let them move down onto a second line instead of squashing together or running off the
+     edge of the card. */
+  flex-wrap: wrap;
 }
 
 .task-card__pill {
@@ -192,23 +214,45 @@
   border-radius: var(--radius-sm);
   background-color: var(--color-panel);
   border: 1px solid var(--color-border);
+  /* We make each tag behave like a small inline block rather than a plain stretch of text, which
+     keeps the background colour and rounded corners sitting neatly around just the words inside
+     it rather than stretching the whole width of the row. */
+  display: inline-block;
 }
 
-/* This is the small message box that pops up near the bottom of the screen whenever something
-   happens, like a task being added or removed. We pin it to the same spot every time and centre it
-   across the width of the screen, so the person always knows where to look for it no matter what
-   action triggered it. */
+/* This is the small message box that pops up whenever something happens, like a task being added
+   or removed. We pin it to the bottom right corner rather than centring it, which keeps it out of
+   the way of the main content while still being easy to spot. The max width stops it stretching
+   too wide on large screens, and margin-left auto pushes it right when there is extra space. */
 .toast {
   position: fixed;
-  bottom: var(--space-lg);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 1.5rem;
+  right: 1.5rem;
+  left: 1.5rem;
+  max-width: 360px;
+  margin-left: auto;
+  padding: var(--space-md);
   background-color: var(--color-panel);
   color: var(--color-white);
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   z-index: 100;
+  animation: toast-in 0.25s ease;
+}
+
+/* This describes the rise and fade animation used just above. The message starts slightly lower
+   down and see through, then moves up into its normal spot while fading in to fully visible. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* When a list has no tasks in it yet, we show this message in the middle of the task area instead
@@ -218,6 +262,11 @@
   color: var(--color-text-muted);
   text-align: center;
   padding: var(--space-xl);
+  
+  /* We add a dashed outline around this message as well, since a dashed line is a common way to
+     show an empty space that is waiting for something, rather than a finished, solid box. */
+  border: 2px dashed var(--color-muted);
+  border-radius: var(--radius-md);
 }
 
 /* We add some space above the task list itself, so it does not sit pressed right up against the
@@ -239,7 +288,7 @@
    since titles are usually the longest piece of text in that row. */
 .new-task-form__row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 1fr auto auto;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
 }
@@ -250,13 +299,15 @@
   font-size: 0.95rem;
 }
 
-/* This is the panel that slides into view when someone chooses to edit a task. We add some space
-   and a thin line above it, so when it opens it feels clearly separate from the add task form
-   sitting above it, rather than blending straight into it. */
+/* This is the panel that slides into view when someone chooses to edit a task. We give it its own
+   background, a coloured border, and some padding so it reads as a clearly separate section rather
+   than blending into the rest of the page above it. */
 .edit-task-form {
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-border);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background-color: var(--color-background-deep);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
 }
 
 .edit-task-form__title {

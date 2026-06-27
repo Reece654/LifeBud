@@ -42,7 +42,23 @@ class Task {
   }
 
   /*
-    getDaysUntilDue whole days between today and the due date.
+    We needed something to calculate the number of days between a task's due date and
+    today, ready for the upcoming tasks, due date label, and completed tasks systems we
+    plan to implement post deployment, or earlier if there is time. We wanted this built
+    now to save time and troubleshooting down the road.
+
+    This was a calculation we hadn't needed to use in some time. We remembered using
+    something similar in a prototype we developed for a previous client outside of our
+    course related projects and recalled there being good resources on GeeksforGeeks.org.
+    We found their article "How to Calculate the Number of Days between Two Dates in
+    JavaScript" and used it to help structure this code.
+
+    From that we learned that subtracting two Date objects in JavaScript returns the
+    difference in milliseconds. We then built msPerDay (1000 * 60 * 60 * 24) based on
+    their example to convert those milliseconds into whole days, and used Math.round()
+    to avoid decimal results caused by small timezone or clock differences.
+
+    getDaysUntilDue returns whole days between today and the due date.
     Negative means overdue. Used inside isDueBetweenDays and getDueDateLabel.
   */
   getDaysUntilDue() {
@@ -54,8 +70,15 @@ class Task {
 
   /*
     getDueDateLabel text for the due pill on a task card.
-    Pills are the small rounded tags on the card (design name). This one shows overdue,
-    due today, or due in N days. Empty string if no date or invalid stored date.
+    This one shows overdue, due today, or due in N days. Empty string if no date or invalid stored date.
+
+    This method is built and ready but is not connected to the UI yet. We made a deliberate
+    decision to keep the launch application simple (KISS) and ship the task cards working with the
+    raw date string first rather than delay the release to wire in the label logic. Once the
+    app is live we plan to replace the raw date in makeTaskCard() in ui.js with a call to
+    getDueDateLabel() so the due date pill shows friendlier text. We will do this at the same
+    time as the completed tasks and upcoming tasks features since all three depend on this
+    same method.
   */
   getDueDateLabel() {
     if (!this.dueDate) {
