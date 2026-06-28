@@ -66,7 +66,9 @@ class Task {
     getDueDateLabel text for the due pill on a task card.
     Pills are the small rounded tags on the card (design name). This one shows overdue,
     due today, or due in N days. Empty string if no date or invalid stored date.
+    see date feature note above getDaysUntilDue, not wired up to the UI.
   */
+ 
   getDueDateLabel() {
     if (!this.dueDate) {
       return "";
@@ -99,7 +101,8 @@ class Task {
 
   /*
     isDueBetweenDays decides if a task appears in the upcoming column (1 to 3 days).
-    Skips tasks with no date or already complete. 
+    Skips tasks with no date or already complete. see date feature note above
+    getDaysUntilDue, not wired up to the UI.
   */
   isDueBetweenDays(minDays, maxDays) {
     if (!this.dueDate || this.isComplete) {
