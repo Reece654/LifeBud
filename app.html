@@ -62,11 +62,21 @@
             Input ids match what ui.js reads and maps to Task class fields.
           -->
           <form class="new-task-form" id="add-task-form">
+
+            <!--
+              List dropdown. ui.js fills this with the user's real list names from Supabase
+              when the page loads so the person can choose which list the new task belongs to.
+            -->
             <div class="field new-task-form__list-field">
               <label for="task-list">List</label>
               <select class="select" id="task-list" aria-label="List"></select>
             </div>
 
+            <!--
+              The three main task fields sit side by side in one row. The title is a free
+              text input, priority is a dropdown defaulting to Medium, and the due date is
+              an optional date picker. ui.js reads all three by id when the form is submitted.
+            -->
             <div class="new-task-form__row">
               <input
                 class="input"
@@ -82,6 +92,9 @@
               <input class="input" type="date" id="task-due-date" aria-label="Due date" />
             </div>
 
+            <!--
+              Optional notes field for any extra detail about the task.
+            -->
             <label class="new-task-form__notes-label" for="task-notes">Notes</label>
             <textarea
               class="textarea"
@@ -89,6 +102,11 @@
               placeholder="Extra information........"
             ></textarea>
 
+            <!--
+              Submit button. type="submit" means pressing Enter in any field in this form
+              will also trigger a submit, not just clicking this button.
+            -->
+              
             <button type="submit" class="btn btn--primary">Add task</button>
           </form>
 
@@ -104,11 +122,20 @@
               -->
               <input type="hidden" id="edit-task-id" />
 
+              <!--
+                List dropdown for the edit form. ui.js fills this with the same list names
+                as the add form and pre-selects whichever list the task currently belongs to.
+              -->
               <div class="field new-task-form__list-field">
                 <label for="edit-task-list">List</label>
                 <select class="select" id="edit-task-list" aria-label="List"></select>
               </div>
 
+              <!--
+                Same three field layout as the add form. ui.js pre fills the title, priority
+                and due date with the task's existing values so the person can change just
+                what they need without having to re enter everything.
+              -->
               <div class="new-task-form__row">
                 <input
                   class="input"
@@ -124,6 +151,10 @@
                 <input class="input" type="date" id="edit-task-due-date" aria-label="Due date" />
               </div>
 
+              <!--
+                Notes field for the edit form. Pre-filled by ui.js with the task's existing
+                notes if it has any, or left blank if the task was saved without notes.
+              -->
               <label class="new-task-form__notes-label" for="edit-task-notes">Notes</label>
               <textarea
                 class="textarea"
@@ -131,6 +162,11 @@
                 placeholder="Extra information........"
               ></textarea>
 
+              <!--
+                Save and Cancel sit side by side. Save submits the edit form which ui.js and
+                intercepts to call Tasks.update. Cancel calls ui.js closeEditTask which hides
+                the panel and resets the fields without saving anything to Supabase.
+              -->
               <div class="edit-task-form__actions">
                 <button type="submit" class="btn btn--primary">Save changes</button>
                 <button type="button" class="btn btn--dark" id="cancel-edit-btn">Cancel</button>

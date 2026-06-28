@@ -1,3 +1,6 @@
+/* This wrapper centres everything on the welcome page both across and down the screen so the
+   card always sits in the middle regardless of how tall or wide the browser window is.*/
+   
 .page-center {
   min-height: 100vh;
   display: flex;
@@ -13,14 +16,23 @@
   text-align: center;
 }
 
+/* We added a small gap below the logo so it does not sit pressed against the tagline text.*/
+
 .welcome-card .logo {
   margin-bottom: var(--space-sm);
 }
+
+/* This is the single sentence just below the logo that sums up what LifeBud is. We make it
+   slightly larger than body text so it reads as a clear step between the logo and the
+   description below it.*/
 
 .welcome-card__tagline {
   font-size: 1.1rem;
   margin-bottom: var(--space-md);
 }
+
+/* This is the longer description paragraph on the welcome screen that gives new visitors a
+   bit more detail about our application.*/
 
 .welcome-card__text {
   color: var(--color-text-muted);
@@ -28,16 +40,19 @@
   line-height: 1.6;
 }
 
+/* This stacks the Log in and Sign up buttons into a column with a gap between them so they
+   sit one above the other rather than side by side, which will work better on narrow screens and
+   gives each button enough room to be easy to tap.*/
+
 .welcome-card__actions {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-/*
-  the login and signup share the auth page so both screens look identical.
-  max width on auth card stops the form stretching on wide monitors.
-*/
+/* The log in and sign up pagees share this same layout so both screens look identical and we
+   only need to write the centring and column arrangement once. It fills the full screen
+   height and stacks the logo header above the form card.*/
 
 .auth-page {
   min-height: 100vh;
@@ -48,14 +63,20 @@
   padding: var(--space-lg);
 }
 
+/* This is the logo and subtitle area that sits above the form card on both our log in and
+   sign up pages. Centring it and adding space below keeps it clearly separate from the content underneath.*/
+
 .auth-page__header {
   text-align: center;
   margin-bottom: var(--space-lg);
 }
 
+/* We add a small gap below the logo on the sign up and log in pages so it does not sit too close to the text directly underneath it.*/
 .auth-page__header .logo {
   margin-bottom: var(--space-xs);
 }
+
+/* This line sits below the logo on the log in page "Welcome Back".*/
 
 .auth-page__subtitle {
   color: var(--color-text-muted);
@@ -68,11 +89,16 @@
   max-width: var(--max-auth-width);
 }
 
+/* This is our heading inside the form card that labels which page the user is on, "Log in"
+   or "Sign up". We make it slightly larger than body text and added space below so it sits
+   clearly above the first input field.*/
+
 .auth-card__title {
   font-size: 1.35rem;
   margin-bottom: var(--space-lg);
 }
 
+/* This is for our terms of service placeholder at the bottom of the sign up card.*/
 .auth-card__terms {
   margin-top: var(--space-md);
   text-align: center;

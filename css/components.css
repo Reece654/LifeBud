@@ -1,4 +1,9 @@
 
+/* This is our LifeBud logo text that appears at the top of the welcome/landing page and the login/sign up pages.
+   We use our logo font and a larger size so it stands out clearly as the app name rather than just
+   blending in with the rest of the page text. This also matches our Figma Prototype.
+   The slight spacing helps the letters pop out a little more clearly.*/
+   
 .logo {
   font-family: var(--font-logo);
   font-weight: 700;
@@ -7,9 +12,15 @@
   color: var(--color-white);
 }
 
+/* On the login and signup pages the logo sits above the form card, we will scale it down so it does not overpower the form content.*/
+
 .logo--small {
   font-size: 1.5rem;
 }
+
+/* This is our base style shared by every button in the app. We use inline flex so the text
+   and any future icons inside the button stay centred both across and down.
+   The transition makes the hover and press effects animate smoothly rather than jumping.*/
 
 .btn {
   display: inline-flex;
@@ -22,9 +33,15 @@
   transition: opacity 0.2s ease, transform 0.15s ease;
 }
 
+/* We reduce the opacity slightly when someone hovers over a button to give a clear visual
+   signal to our users that it is interactive without changing its colour or shape.*/
+
 .btn:hover {
   opacity: 0.92;
 }
+
+/* When a button is clicked we scale it down very slightly to replicate the feeling of actually pressing physical button.
+THis makes the interaction feel more responsive for each of our users.*/
 
 .btn:active {
   transform: scale(0.98);

@@ -1,3 +1,8 @@
+/* We apply box sizing to every element and its before and after elements so that padding
+   and borders are counted as part of the width rather than added on top of it. We also clear
+   the default margin and padding that browsers add to elements since we want to control our
+   own spacing consistently across our whole application.*/
+
 *,
 *::before,
 *::after {
@@ -6,9 +11,19 @@
   padding: 0;
 }
 
+/* Setting the root font size to 16px means every rem value in our stylesheets works off this
+   number, so if we ever needed to scale text and spacing across the whole app we could do it
+   by changing just this one value.*/
+
 html {
   font-size: 16px;
 }
+
+/* These are the base styles for the page itself. We set a minimum height so the background
+   colour fills the full screen even on our pages with very little content, and we apply our font,
+   text colour and background colour here so every page in the app inherits them without
+   needing to repeat them. The line height adds a little space between each line of text to
+   make it more comfortable for our users to read.*/
 
 body {
   min-height: 100vh;
@@ -17,6 +32,11 @@ body {
   background-color: var(--color-background);
   line-height: 1.5;
 }
+
+/* We give links our accent colour and remove the underline that browsers add by default since
+   most of our links sit inside navigation or below forms rather than in long paragraphs where
+   an underline would normally help. We bring it back on hover so it is still clear the text
+   is clickable when someone moves their mouse over it.*/
 
 a {
   color: var(--color-accent-light);
@@ -27,10 +47,21 @@ a:hover {
   text-decoration: underline;
 }
 
+/* There are no images in the current version of LifeBud but we have added this for future use,
+   default for any we add later e.g. icons or a profile picture in a future sprint, updated logo etc.
+   It stops images stretching wider than their container and removes a small gap the browser adds
+   below them when they are treated as inline elements.*/
+
 img {
   max-width: 100%;
   display: block;
 }
+
+/* Some browsers apply their own default fonts and colours, this means inputs,
+   selects and buttons can look different from the rest of the page even when the theme is
+   set. Setting both to inherit overrides the browser defaults and makes these elements
+   use the same font and colour we have already set on the body, this way they match the rest of
+   the application without us having to repeat our theme values for each one.*/
 
 button,
 input,
@@ -40,12 +71,19 @@ textarea {
   color: inherit;
 }
 
+/* We strip out the default border, background and pointer style that browsers add to buttons
+   so we can start from a clean base and apply our own button styles without overriding browser
+   defaults each time. */
+
 button {
   cursor: pointer;
   border: none;
   background: none;
 }
 
+/* We remove the bullet points that browsers add to lists by default since we use lists for
+   things like sidebar buttons and task cards where bullets would look out of place.*/
+   
 ul {
   list-style: none;
 }

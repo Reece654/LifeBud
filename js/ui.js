@@ -1,9 +1,12 @@
 const UI = {
 
   // We call this from main.js when the welcome page loads. Its job is to attach click handlers to the two entry buttons so they change page through Navigation instead of relying on raw links alone.
+  // The two buttons are the Log in and Sign up buttons on index.html. Log in takes the person to login.html and Sign up takes them to signup.html. We wire them through Navigation rather
+  // than using plain href links so all page changes in LifeBud go through one class, which keeps our routing consistent and easier to update if page names ever change.
   setupWelcomePage: function () {
 
     // We use getElementById to find the buttons by the id values set in index.html. If either id is missing the matching variable stays null and we skip wiring that button so the rest of the page still runs.
+    // The two ids we are looking for are welcome-login and welcome-signup, which are set on the Log in and Sign up buttons in index.html. Wrapping each in an if check means that if one button is ever removed or its id changed, the other still works and the page does not break entirely.
     const loginButton = document.getElementById("welcome-login");
     const signupButton = document.getElementById("welcome-signup");
 
@@ -44,7 +47,10 @@ const UI = {
     }
 
     // main.js may load ui.js on several pages. If login.html is not the current page the form will not be on the page and we return early instead of trying to set up submit code when there is no form to work with.
-    
+    // ui.js is one shared file used across all LifeBud pages.
+    // main.js always runs it, but setupLoginPage is only meant to run on login.html. 
+    // If someone is on the welcome page or the signup page instead, the login form with id login-form simply will not exist in the HTML, 
+    // so form will be null. Without this check the code below would crash trying to add a submit listener to something that is not there.
     if (!form) {
       return;
     }
@@ -88,7 +94,10 @@ const UI = {
     if (loginLink) {
 
       // The click handler runs before the browser follows the link. We block that default path and navigate ourselves so behaviour stays consistent across the app.
-      
+      // This is for the "Already have an account? Login" text at the bottom of the signup form. 
+      // Without preventDefault the browser would just follow the href to login.html on its own. 
+      // We intercept it and use Navigation.goToLogin instead so the page change goes through the same class as every other navigation in LifeBud rather
+      // than being the one link that behaves differently.
       loginLink.addEventListener("click", function (event) {
         event.preventDefault();
         Navigation.goToLogin();
@@ -97,7 +106,9 @@ const UI = {
 
     // If signup.html is not open the form will not exist on the page. 
     // We stop here rather than trying to connect submit code to something that is missing, which would cause an error.
-
+    // This is the same safety check we use in setupLoginPage. Because ui.js runs on every LifeBud page, setupSignupPage will be called even when the person is on the welcome
+    // page or the login page where the signup form with id signup-form does not exist.
+    // Returning early here means those pages are unaffected and only signup.html actually sets up the form behaviour.
     if (!form) {
       return;
     }
@@ -107,7 +118,7 @@ const UI = {
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      // We read each input one at a time because auth checks names, email shape, and password length on its own before it tries to create the account online.
+      // We read each input one at a time because auth checks names, email, and password length on its own before it tries to create the account online.
 
       const firstName = document.getElementById("signup-first-name").value;
       const surname = document.getElementById("signup-surname").value;
@@ -131,7 +142,7 @@ const UI = {
       messageBox.style.color = "var(--color-accent-light)";
       messageBox.textContent = result.message;
 
-      // We wait (900 milliseconds) before opening login so the person has time to read the success message, then Navigation loads the login page for them.
+      // We wait (0.9 seconds) before opening login so the person has time to read the success message, then Navigation loads the login page for them.
 
       setTimeout(function () {
         Navigation.goToLogin();
@@ -171,6 +182,12 @@ showToast: function (message) {
   makeTaskCard: function (task) {
 
     // We create a new article element in memory and pick a css class from the priority so the card border colour can reflect how urgent the task is.
+    // The article element we create is a standard HTML element meant for self contained pieces of content, e.g. our task cards and since each one holds everything about one task 
+    // We build it in memory first rather than writing it straight into the page so we can fully construct and fill it before it becomes visible. 
+    // Once it is ready we attach it to the task list area in one go.
+    // The priority class we add here is what makes the coloured left border appear on each card. 
+    // A high priority task gets task-card--priority-high, medium gets task-card--priority-medium, and low gets task-card--priority-low. 
+    // Each of those classes is defined in our components.css file with a different border colour from our theme.
 
     const card = document.createElement("article");
     const priorityKey = (task.priority || "Medium").toLowerCase();
@@ -203,7 +220,7 @@ showToast: function (message) {
        friendlier text instead of the raw date, such as "Due today" or
        "Overdue by 1 day". We will wire that in at the same time as the completed tasks and
        upcoming tasks features, since all three rely on the same date logic in Task.js. */
-       
+
     if (task.dueDate) {
       const datePill = document.createElement("span");
       datePill.className = "task-card__pill";
@@ -328,6 +345,9 @@ showToast: function (message) {
     }
 
     // We copy each value from the task into the matching input. Optional fields that are empty become blank strings so the inputs never show the word undefined.
+    // When someone clicks Edit on a task card, our code fills the edit form with that task's existing information so they do not have to retype everything from scratch. 
+    // Our task object passed in here is built from Supabase data when the cards loaded, so its values are whatever the person originally saved.
+    // Due date and notes use the or empty string fallback because Supabase returns null for fields the person left blank, and setting an input value to null would show the text "null" inside the field rather than leaving it empty.
 
     idInput.value = task.id;
     titleInput.value = task.title;
@@ -351,7 +371,11 @@ showToast: function (message) {
     const panel = document.getElementById("edit-task-panel");
     const form = document.getElementById("edit-task-form");
 
-    // We add the hidden class to tuck the panel away and tell assistive tech it is closed even though the html stays in the page for next time.
+    // We hide the edit task panel by adding is-hidden, which sets display none in our CSS.
+    // We also set aria-hidden to true so screen readers know the panel is no longer active.
+    // The HTML for the panel stays in the page the whole time rather than being removed,
+    // because the next time someone clicks Edit we just show it again and refill the fields
+    // rather than rebuilding it from scratch each time.
 
     if (panel) {
       panel.classList.add("is-hidden");

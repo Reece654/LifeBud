@@ -1,6 +1,14 @@
-
-
+/* THis file holds all of our design values in one place as CSS variables. Keeping them here
+   means if we ever want to change a colour, font, or spacing value we only need to update it
+   once and it will flow through to every part of the app that uses it. The variables are
+   grouped into colours, fonts, spacing, border radius, and layout widths so they are easy
+   to find. These values match our Figma design and are mirrored in Theme.js, which is an
+   OOP JavaScript class that applies the same values to the page at runtime so the live
+   theme always comees from one source of truth rather than being hard coded in multiple
+   places.*/
+   
 :root {
+  /* Colours */
   --color-primary: #6e93c4;
   --color-white: #ffffff;
   --color-panel: #2e496d;
@@ -14,16 +22,24 @@
   --color-priority-high: #c45c5c;
   --color-priority-medium: #c4a35c;
   --color-priority-low: #5c9a6e;
+
+  /* Fonts */
   --font-logo: "Tahoma", "Segoe UI", sans-serif;
   --font-body: "Segoe UI", Tahoma, sans-serif;
+
+  /* Spacing */
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
   --space-md: 1rem;
   --space-lg: 1.5rem;
   --space-xl: 2rem;
+
+  /* Border radius */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+
+  /* Layout widths */
   --sidebar-width: 200px;
   --upcoming-width: 260px;
   --max-page-width: 1200px;
