@@ -9,7 +9,8 @@ const Tasks = {
   // gets all tasks for the logged in user from Supabase
   getAll: async function () {
 
-    // asks Supabase for all tasks belonging to the current user
+    // relies entirely on RLS to scope rows to this user, no user_id filter on the query itself.
+    // RLS being disabled is exactly what caused the cross-user task leak earlier in testing
     const result = await supabaseClient
       .from("tasks")
       .select("*")
@@ -32,7 +33,8 @@ const Tasks = {
     });
   },
 
-  // gets all tasks for a specific list
+  // filters here in js instead of in the supabase query so this can just reuse getAll().
+  // means it fetches every task first then throws away ones not in this list.
   getByList: async function (listName) {
 
     // gets all tasks then filters by list name
@@ -54,7 +56,8 @@ const Tasks = {
     const cleanListName = taskData.listName ? taskData.listName.trim() : "";
     const listName = cleanListName === "" ? "General" : cleanListName;
 
-    // sends the new task to Supabase and waits for a response
+    // grabs the logged in users id straight from the session here instead of a separate variable.
+    // this nested await is messy and is on the list to clean up in the tasks.js and lists.js refactor pass.
     const result = await supabaseClient
       .from("tasks")
       .insert({
@@ -95,6 +98,8 @@ const Tasks = {
     const listName = cleanListName === "" ? "General" : cleanListName;
 
     // sends the updated fields to Supabase and waits for a response
+    // only matches by taskId here, no user_id check in this query.
+    // relies entirely on RLS to block updates to tasks that arent this users.
     const result = await supabaseClient
       .from("tasks")
       .update({
@@ -131,6 +136,7 @@ const Tasks = {
   remove: async function (taskId) {
 
     // sends the delete request to Supabase and waits for a response
+    // relies entirely on RLS to block the deletion of tasks that arent this users.
     const result = await supabaseClient
       .from("tasks")
       .delete()

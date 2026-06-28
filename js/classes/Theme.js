@@ -4,6 +4,8 @@
   applyToPage() on load so our whole app shares the same colours and spacing.
   */
 
+// builds one theme object holding every colour, font, spacing and layout value
+// applyToPage() (below) is what actually pushes these onto the page, this just sets them up
 class Theme {
   constructor() {
    
@@ -13,6 +15,7 @@ class Theme {
       If we change primary here, login buttons etc. all update together because they use var(--color-primary) in components.css.
     */
 
+    // font stacks for headings/logo text vs normal body text, with safe fallbacks if the first font isnt available
     this.colors = {
       primary: "#6E93C4",
       white: "#FFFFFF",
@@ -33,7 +36,7 @@ class Theme {
       logo: '"Tahoma", "Segoe UI", sans-serif',
       body: '"Segoe UI", Tahoma, sans-serif'
     };
-
+    // consistent gap sizes used for padding and margins across components.css
     this.spacing = {
       xs: "0.5rem",
       sm: "0.75rem",
@@ -42,6 +45,7 @@ class Theme {
       xl: "2rem"
     };
 
+    // corner rounding for cards, buttons, and panels
     this.radii = {
       sm: "8px",
       md: "12px",

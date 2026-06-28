@@ -7,6 +7,8 @@
 const Lists = {
 
   // gets all lists for the logged in user from Supabase
+  // relies entirely on RLS to scope rows to this user, no user_id filter on the query itself
+  // RLS being disabled is exactly what caused the cross-user task leak earlier in testing
   getAll: async function () {
 
     // asks Supabase for all lists belonging to the current user

@@ -41,25 +41,19 @@ class Task {
     return new Date(parts[0], parts[1] - 1, parts[2]);
   }
 
+/*
+    date feature note (applies to getDaysUntilDue, getDueDateLabel, and isDueBetweenDays).
+    all three were built for the upcoming tasks column and due date pills, but we decided
+    not to wire any of it up to the UI. designing and connecting it properly wasnt part of
+    our original proposal and would have meant scope creep, so we left the logic here for
+    the post deployment backlog instead of deleting the work.
+  */
+
   /*
-    We needed something to calculate the number of days between a task's due date and
-    today, ready for the upcoming tasks, due date label, and completed tasks systems we
-    plan to implement post deployment, or earlier if there is time. We wanted this built
-    now to save time and troubleshooting down the road.
-
-    This was a calculation we hadn't needed to use in some time. We remembered using
-    something similar in a prototype we developed for a previous client outside of our
-    course related projects and recalled there being good resources on GeeksforGeeks.org.
-    We found their article "How to Calculate the Number of Days between Two Dates in
-    JavaScript" and used it to help structure this code.
-
-    From that we learned that subtracting two Date objects in JavaScript returns the
-    difference in milliseconds. We then built msPerDay (1000 * 60 * 60 * 24) based on
-    their example to convert those milliseconds into whole days, and used Math.round()
-    to avoid decimal results caused by small timezone or clock differences.
-
-    getDaysUntilDue returns whole days between today and the due date.
-    Negative means overdue. Used inside isDueBetweenDays and getDueDateLabel.
+    getDaysUntilDue, whole days between today and the due date.
+    negative means overdue. used inside isDueBetweenDays and getDueDateLabel.
+    subtracting two Date objects gives the difference in milliseconds, msPerDay
+    converts that into days, Math.round avoids decimals from timezone rounding.
   */
   getDaysUntilDue() {
     const today = Task.getTodayStart();
@@ -70,15 +64,8 @@ class Task {
 
   /*
     getDueDateLabel text for the due pill on a task card.
-    This one shows overdue, due today, or due in N days. Empty string if no date or invalid stored date.
-
-    This method is built and ready but is not connected to the UI yet. We made a deliberate
-    decision to keep the launch application simple (KISS) and ship the task cards working with the
-    raw date string first rather than delay the release to wire in the label logic. Once the
-    app is live we plan to replace the raw date in makeTaskCard() in ui.js with a call to
-    getDueDateLabel() so the due date pill shows friendlier text. We will do this at the same
-    time as the completed tasks and upcoming tasks features since all three depend on this
-    same method.
+    Pills are the small rounded tags on the card (design name). This one shows overdue,
+    due today, or due in N days. Empty string if no date or invalid stored date.
   */
   getDueDateLabel() {
     if (!this.dueDate) {
@@ -112,7 +99,7 @@ class Task {
 
   /*
     isDueBetweenDays decides if a task appears in the upcoming column (1 to 3 days).
-    Skips tasks with no date or already complete. Complete UI comes in a later sprint.
+    Skips tasks with no date or already complete. 
   */
   isDueBetweenDays(minDays, maxDays) {
     if (!this.dueDate || this.isComplete) {

@@ -406,6 +406,7 @@ showToast: function (message) {
     }
 
     // We trim spaces from text fields and pack the values into one object that matches what Tasks.update expects, then we wait for storage to confirm the save.
+    // Note: the fallback here defaults to "Medium" capitalized, but the actual dropdown option value is lowercase "medium". Only matters if priorityInput is ever missing from the page
 
     const result = await Tasks.update(idInput.value, {
       title: titleInput.value.trim(),
@@ -453,6 +454,9 @@ showToast: function (message) {
     // creates a default General list if this user genuinely has none yet
     if (lists.length === 0) {
       await Lists.add("General");
+      // re-fetches from Supabase here instead of just pushing "General" into the local
+      // lists array, Lists.add can fail or return something different (e.g. if General
+      // already existed), so this confirms what actually got saved instead of assuming
       lists = await Lists.getAll();
     }
 
@@ -510,6 +514,8 @@ showToast: function (message) {
 
     // defaults the add task dropdown to whatever list is currently active
     // so it lines up with the heading and task cards already on screen instead of jumping back to the first option
+    // editListSelect doesnt need a default here, openEditTask sets its value to the
+    // tasks own list every time the edit panel opens, before the person ever sees it
     if (taskListSelect) {
       taskListSelect.value = UI.getActiveList();
     }
@@ -548,6 +554,8 @@ showToast: function (message) {
       // here, since otherwise they would keep showing whichever list was active when the page first
       // loaded rather than the one the person just switched to. Finally we redraw the sidebar buttons
       // themselves so the highlighted one moves to match.
+      // Calling fillListButtons again here isnt recursion, this just runs once later when the
+      // button is actually clicked, not immediately while fillListButtons is still building the list.
       button.addEventListener("click", async function () {
         UI.setActiveList(name);
         await UI.refreshDashboard();
@@ -583,6 +591,7 @@ showToast: function (message) {
 
     
     // makes sure the active list genuinely exists before we draw anything using it
+    // this has to run before refreshDashboard, refreshDashboard just draws whatever UI.getActiveList() currently returns, it doesnt check if that list is real
     await UI.ensureActiveListExists();
 
     // We draw the active list's tasks right away so they appear as soon as the page loads and the person does not need to click anything first.
@@ -595,6 +604,7 @@ showToast: function (message) {
 
     // opens the realtime channel so the dashboard updates straight away if a task changes
     // on another device signed into the same account, no manual refresh needed
+    // we added this here, after login and the dashboard setup, since real time sync needs an active session and a loaded dashboard to actually have something to refresh
     Tasks.subscribeToChanges();
 
     // does the same thing but for lists, so the sidebar and dropdowns update straight away too
@@ -607,6 +617,7 @@ showToast: function (message) {
     const confirmAddListButton = document.getElementById("confirm-add-list-btn");
 
     // clicking add list just reveals the hidden panel, nothing saved yet
+    // this input isnt inside a form and the add button is type="button", so pressing enter in the new list field does nothing, the confirm button is the only way to save
     if (addListButton && addListPanel) {
       addListButton.addEventListener("click", function () {
 
@@ -691,6 +702,7 @@ showToast: function (message) {
 
         // listName comes from whichever option is selected in the list dropdown
         // priority defaults to Medium so it is never blank in storage if the person skips it
+        // Note: this fallback is capitalized "Medium" but the dropdown option value is lowercase "medium", same small mismatch as in saveEditTask
         const result = await Tasks.add({
           listName: listInput ? listInput.value : UI.getActiveList(),
           title: titleInput ? titleInput.value.trim() : "",
