@@ -50,10 +50,18 @@ class Task {
   */
 
   /*
-    getDaysUntilDue, whole days between today and the due date.
-    negative means overdue. used inside isDueBetweenDays and getDueDateLabel.
-    subtracting two Date objects gives the difference in milliseconds, msPerDay
-    converts that into days, Math.round avoids decimals from timezone rounding.
+    We needed something to calculate the number of days between a task's due date and
+    today, ready for the upcoming tasks, due date label, and completed tasks systems we
+    plan to implement post deployment, or earlier if there is time. We wanted this built
+    now to save time and troubleshooting down the road.
+    This was a calculation we hadn't needed use in some time. We remembered using
+    something similar in a prototype we developed for a previous client outside of our course related 
+    projects and recalled there being good resources available on GeeksforGeeks.org. 
+    We found their article "How to Calculate the Number of Days between Two Dates in JavaScript" and used it to help structure this code.
+    From that we learned that subtracting two Date objects in JavaScript returns the
+    difference in milliseconds. We then built msPerDay (1000 * 60 * 60 * 24) based on
+    their example to convert those milliseconds into whole days, and used Math.round()
+    to avoid decimal results caused by small timezone or clock differences.
   */
   getDaysUntilDue() {
     const today = Task.getTodayStart();
